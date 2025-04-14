@@ -22,6 +22,7 @@ namespace SM64Mod
         static List<SM64DynamicTerrain> _surfaceObjects = new List<SM64DynamicTerrain>();
         public static SM64Plugin Instance { get; private set; }
         public static new ManualLogSource Logger { get; private set; }
+        private GameObject _player;
         public void Awake()
         {
             Instance = this;
@@ -177,6 +178,7 @@ namespace SM64Mod
                 // "p" is the player object/component in this case.
                 // You'll need to get this object yourself
                 GameObject p = GameObject.Find("Player");
+                _player = p;
                 if (p != null)
                 {
                     Renderer[] r = p.GetComponentsInChildren<Renderer>();
@@ -230,7 +232,21 @@ namespace SM64Mod
                         mario.SetMaterial(material);
                         RegisterMario(mario);
 
-                        p.SetActive(false);
+                        //p.SetActive(false);
+                        Component script = _player.GetComponent("PlayerControl");
+                        Behaviour behaviour = script as Behaviour;
+                        behaviour.enabled = false;
+                        script = _player.GetComponent("PlayerSounds");
+                        behaviour = script as Behaviour;
+                        behaviour.enabled = false;
+                        _player.transform.Find("Hub").gameObject.SetActive(false);
+                        _player.transform.Find("Pot").gameObject.SetActive(false);
+                        _player.transform.Find("dude").gameObject.transform.Find("Body").gameObject.SetActive(false);
+                        _player.transform.Find("dude").gameObject.transform.Find("Eyes").gameObject.SetActive(false);
+                        _player.transform.Find("dude").gameObject.transform.Find("Eyelashes").gameObject.SetActive(false);
+                        _player.transform.Find("PotCollider").gameObject.SetActive(false);
+                        _player.transform.Find("handle").gameObject.SetActive(false);
+                        GameObject.Find("Cursor").SetActive(false);
                     }
                     else
                         Logger.LogMessage("Failed to spawn Mario");
@@ -244,6 +260,11 @@ namespace SM64Mod
 
             foreach (var o in _marios)
                 o.contextUpdate();
+            if (_player != null && _marios.Count > 0)
+            {
+                _player.transform.position = _marios[0].transform.position;
+
+            }
         }
         public void FixedUpdate()
         {
