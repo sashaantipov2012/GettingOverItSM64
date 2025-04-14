@@ -176,7 +176,7 @@ namespace SM64Mod
 
                 // "p" is the player object/component in this case.
                 // You'll need to get this object yourself
-                
+                GameObject p = GameObject.Find("Player");
                 if (p != null)
                 {
                     Renderer[] r = p.GetComponentsInChildren<Renderer>();
