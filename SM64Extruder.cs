@@ -7,7 +7,7 @@ using System.Collections.Generic;
 /// </summary>
 /// <remarks>Source: https://forum.unity3d.com/threads/trying-extrude-a-2d-polygon-to-create-a-mesh.102629/ </remarks>
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer), typeof(PolygonCollider2D))]
-public class ExtrudeSprite : MonoBehaviour
+public class SM64Extruder : MonoBehaviour
 {
   public Color extrudeColor = Color.white;
   public float frontDistance = -0.249f;
