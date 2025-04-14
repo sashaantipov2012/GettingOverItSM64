@@ -50,15 +50,12 @@ namespace LibSM64
             {
                 case Button.Jump:
                     return Input.GetKey(KeyCode.L);
-                    break;
 
                 case Button.Kick:
                     return Input.GetKey(KeyCode.Comma);
-                    break;
 
                 case Button.Stomp:
                     return Input.GetKey(KeyCode.K);
-                    break;
             }
 
             return result;
