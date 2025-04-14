@@ -100,7 +100,8 @@ namespace SM64Mod
             * I'll leave behind an example that does all this.
             * You'll need to adapt it to the game you're modding.
             */
-            if (scene.buildIndex == -1)
+            //if (scene.buildIndex == -1)
+            if (true)
             {
                 MeshCollider[] meshCols = GameObject.FindObjectsOfType<MeshCollider>();
                 BoxCollider[] boxCols = GameObject.FindObjectsOfType<BoxCollider>();
@@ -175,6 +176,7 @@ namespace SM64Mod
 
                 // "p" is the player object/component in this case.
                 // You'll need to get this object yourself
+                
                 if (p != null)
                 {
                     Renderer[] r = p.GetComponentsInChildren<Renderer>();
@@ -184,10 +186,10 @@ namespace SM64Mod
                         Logger.LogMessage($"MAT NAME {i} '{r[i].material.name}' '{r[i].material.shader.name}'");
 
                         // Make the original player object invisible by forcing the material to not render
-                        r[i].forceRenderingOff = true;
+                        //r[i].forceRenderingOff = true;
 
                         // Change this with the shader that you want. You'll have to play around a bit
-                        if (material == null && r[i].material.shader.name.StartsWith("Toony Colors Pro 2"))
+                        if (material == null && r[i].material.shader.name.StartsWith("Standard"))
                             material = Material.Instantiate<Material>(r[i].material);
                     }
 
