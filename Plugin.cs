@@ -200,7 +200,7 @@ namespace SM64Mod
                     }
 
                     // Uncomment this to create a test SM64 surface at the player's spawn position
-                    /*
+                    
                     Vector3 P = p.transform.position;
                     P.y -= 2;
                     GameObject surfaceObj = new GameObject("SM64_SURFACE");
@@ -218,7 +218,7 @@ namespace SM64Mod
                     mesh.SetTriangles(new int[] { 0, 1, 2, 3, 4, 5 }, 0);
                     surfaceMesh.sharedMesh = mesh;
                     RefreshStaticTerrain();
-                    */
+                    
 
                     GameObject marioObj = new GameObject("SM64_MARIO");
                     marioObj.transform.position = p.transform.position;
