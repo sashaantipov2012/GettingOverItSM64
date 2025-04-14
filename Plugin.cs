@@ -15,7 +15,7 @@ using UnityEngine.SceneManagement;
 
 namespace SM64Mod
 {
-    [BepInPlugin("com.username.sm64mario", "SM64 Mario Mod", "1.0.0")]
+    [BepInPlugin("com.sashaant.sm64mario", "SM64 Mario Mod", "1.0.0")]
     public class SM64Plugin : BaseUnityPlugin
     {
         static List<SM64Mario> _marios = new List<SM64Mario>();
