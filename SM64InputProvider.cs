@@ -31,7 +31,15 @@ namespace LibSM64
             // Check for held button or left analog stick axis in the player's input object.
             // For analog stick: return new Vector2(axis.z, -axis.x);
             // For button held: return -((buttonLeft) ? Vector2.left : (buttonRight) ? Vector2.right : Vector2.zero);
-            return new Vector2(0, 0);
+            float vertical = 0f;
+            if (Input.GetKey(KeyCode.W)) vertical = 1f;
+            else if (Input.GetKey(KeyCode.S)) vertical = -1f;
+
+            float horizontal = 0f;
+            if (Input.GetKey(KeyCode.D)) horizontal = 1f;
+            else if (Input.GetKey(KeyCode.A)) horizontal = -1f;
+
+            return new Vector2(vertical, -horizontal).normalized;
         }
 
         public override bool GetButtonHeld(Button button)
@@ -41,15 +49,15 @@ namespace LibSM64
             switch (button)
             {
                 case Button.Jump:
-                    //result = inp.GetButton(JUMP);
+                    return Input.GetKey(KeyCode.L);
                     break;
 
                 case Button.Kick:
-                    //result = inp.GetButton(EQUIPMENT);
+                    return Input.GetKey(KeyCode.Comma);
                     break;
 
                 case Button.Stomp:
-                    //result = inp.GetButton(INTERACT);
+                    return Input.GetKey(KeyCode.K);
                     break;
             }
 
