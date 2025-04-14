@@ -389,7 +389,7 @@ namespace LibSM64
             sm64_mario_tick( marioId, ref inputs, ref outState, ref buff );
 		
  	    //uncomment to make Mario stay in 2D
- 	    //sm64_set_mario_position(marioId, outState.position[0], outState.position[1], -1*SCALE_FACTOR);
+ 	    sm64_set_mario_position(marioId, outState.position[0], outState.position[1], -1*SCALE_FACTOR);
 		
             posHandle.Free();
             normHandle.Free();
