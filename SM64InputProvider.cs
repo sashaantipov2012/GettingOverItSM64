@@ -49,13 +49,13 @@ namespace LibSM64
             switch (button)
             {
                 case Button.Jump:
-                    return Input.GetKey(KeyCode.L);
+                    return Input.GetKey(KeyCode.Space);
 
                 case Button.Kick:
-                    return Input.GetKey(KeyCode.Comma);
+                    return Input.GetKey(KeyCode.LeftControl);
 
                 case Button.Stomp:
-                    return Input.GetKey(KeyCode.K);
+                    return Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.S);
             }
 
             return result;
