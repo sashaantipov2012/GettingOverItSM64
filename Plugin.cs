@@ -23,6 +23,7 @@ namespace SM64Mod
         public static SM64Plugin Instance { get; private set; }
         public static new ManualLogSource Logger { get; private set; }
         private GameObject _player;
+        public GameObject Player => _player;
         public void Awake()
         {
             Instance = this;
@@ -104,6 +105,8 @@ namespace SM64Mod
             //if (scene.buildIndex == -1)
             if (true)
             {
+                GameObject visualizerObject = new GameObject("ColliderToMesh");
+                visualizerObject.AddComponent<ColliderToMesh>();
                 MeshCollider[] meshCols = GameObject.FindObjectsOfType<MeshCollider>();
                 BoxCollider[] boxCols = GameObject.FindObjectsOfType<BoxCollider>();
 
