@@ -105,8 +105,8 @@ namespace SM64Mod
             //if (scene.buildIndex == -1)
             if (true)
             {
-                GameObject visualizerObject = new GameObject("ColliderToMesh");
-                visualizerObject.AddComponent<ColliderToMesh>();
+                GameObject ColliderToMeshObject = new GameObject("ColliderToMesh");
+                ColliderToMeshObject.AddComponent<ColliderToMesh>();
                 MeshCollider[] meshCols = GameObject.FindObjectsOfType<MeshCollider>();
                 BoxCollider[] boxCols = GameObject.FindObjectsOfType<BoxCollider>();
 
