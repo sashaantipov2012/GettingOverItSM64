@@ -67,10 +67,20 @@ public class ColliderToMesh : MonoBehaviour
     public void SelectAllColliders()
     {
         polygonCollider2Ds = FindObjectsOfType<PolygonCollider2D>()
-            .Where(x => x.gameObject.scene == gameObject.scene && x.gameObject.name != "Player")
+            .Where(x => x.gameObject.scene == gameObject.scene && !x.isTrigger &&
+                        !IsChildOfPlayer(x.transform))
             .ToArray();
     }
-
+    private bool IsChildOfPlayer(Transform t)
+    {
+        while (t != null)
+        {
+            if (t.name == "Player")
+                return true;
+            t = t.parent;
+        }
+        return false;
+    }
     public void CreateMeshes()
     {
         GameObject compositeHolder = new GameObject("TempCompositeHolder");
