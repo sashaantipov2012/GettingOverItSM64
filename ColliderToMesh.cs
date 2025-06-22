@@ -8,13 +8,13 @@ using UnityEngine;
 public class ColliderToMesh : MonoBehaviour
 {
     [SerializeField]
-    public PolygonCollider2D[] polygonCollider2Ds;
-    //public bool addRenderer = true;
+    public Collider2D[] colliders;
     public bool addRenderer = false;
     public Material material;
     public float updateInterval = 0.1f;
 
     private float timer = 0f;
+
     void Awake()
     {
         if (material == null)
@@ -66,40 +66,93 @@ public class ColliderToMesh : MonoBehaviour
 
     public void SelectAllColliders()
     {
-        polygonCollider2Ds = FindObjectsOfType<PolygonCollider2D>()
-            .Where(x => x.gameObject.scene == gameObject.scene && !x.isTrigger &&
-                        !IsChildOfPlayer(x.transform))
+        colliders = FindObjectsOfType<Collider2D>()
+            .Where(x => (x is PolygonCollider2D || x is BoxCollider2D || x is CircleCollider2D) &&
+                        x.gameObject.scene == gameObject.scene &&
+                        !x.isTrigger &&
+                        IsAllowed(x.transform))
             .ToArray();
     }
-    private bool IsChildOfPlayer(Transform t)
+    private bool IsAllowed(Transform t)
     {
         while (t != null)
         {
-            if (t.name == "Player")
-                return true;
+            if (t.name == "Player" || t.name == "Orange" || t.name == "Coffee+Cup+Takeaway" || t.name == "SnowHat")
+                return false;
             t = t.parent;
         }
-        return false;
+        return true;
     }
     public void CreateMeshes()
     {
         GameObject compositeHolder = new GameObject("TempCompositeHolder");
         compositeHolder.SetActive(false);
-        Rigidbody2D rb = compositeHolder.AddComponent<Rigidbody2D>();
-        rb.bodyType = RigidbodyType2D.Static;
         CompositeCollider2D compositeCollider = compositeHolder.AddComponent<CompositeCollider2D>();
         compositeCollider.geometryType = CompositeCollider2D.GeometryType.Polygons;
 
-        foreach (PolygonCollider2D originalPoly in polygonCollider2Ds)
+        foreach (Collider2D originalCollider in colliders)
         {
             GameObject child = new GameObject("TempPoly");
             child.transform.SetParent(compositeHolder.transform, false);
             PolygonCollider2D childPoly = child.AddComponent<PolygonCollider2D>();
             childPoly.usedByComposite = true;
-            childPoly.points = originalPoly.points;
-            child.transform.position = originalPoly.transform.position;
-            child.transform.rotation = originalPoly.transform.rotation;
-            child.transform.localScale = originalPoly.transform.lossyScale;
+            Vector3 lossyScale = originalCollider.transform.lossyScale;
+
+            if (originalCollider is PolygonCollider2D originalPoly)
+            {
+                Vector2[] scaledPoints = new Vector2[originalPoly.points.Length];
+                for (int i = 0; i < originalPoly.points.Length; i++)
+                {
+                    scaledPoints[i] = new Vector2(
+                        originalPoly.points[i].x * lossyScale.x,
+                        originalPoly.points[i].y * lossyScale.y
+                    );
+                }
+                childPoly.points = scaledPoints;
+                childPoly.offset = originalPoly.offset;
+                child.transform.position = originalPoly.transform.position;
+                child.transform.rotation = originalPoly.transform.rotation;
+                child.transform.localScale = originalPoly.transform.lossyScale;
+            }
+            else if (originalCollider is BoxCollider2D box)
+            {
+                Vector2[] points = new Vector2[4];
+                float halfWidth = (box.size.x * lossyScale.x) / 2f;
+                float halfHeight = (box.size.y * lossyScale.y) / 2f;
+                Vector2 scaledOffset = new Vector2(
+                    box.offset.x * lossyScale.x,
+                    box.offset.y * lossyScale.y
+                );
+                points[0] = scaledOffset + new Vector2(-halfWidth, -halfHeight);
+                points[1] = scaledOffset + new Vector2(halfWidth, -halfHeight);
+                points[2] = scaledOffset + new Vector2(halfWidth, halfHeight);
+                points[3] = scaledOffset + new Vector2(-halfWidth, halfHeight);
+                childPoly.points = points;
+            }
+            else if (originalCollider is CircleCollider2D circle)
+            {
+                int numSegments = 32;
+                Vector2[] points = new Vector2[numSegments];
+                float radiusX = circle.radius * lossyScale.x;
+                float radiusY = circle.radius * lossyScale.y;
+                Vector2 scaledOffset = new Vector2(
+                    circle.offset.x * lossyScale.x,
+                    circle.offset.y * lossyScale.y
+                );
+                for (int i = 0; i < numSegments; i++)
+                {
+                    float angle = (float)i / numSegments * Mathf.PI * 2f;
+                    points[i] = scaledOffset + new Vector2(
+                        Mathf.Cos(angle) * radiusX,
+                        Mathf.Sin(angle) * radiusY
+                    );
+                }
+                childPoly.points = points;
+            }
+
+            child.transform.position = originalCollider.transform.position;
+            child.transform.rotation = originalCollider.transform.rotation;
+            child.transform.localScale = Vector3.one;
         }
 
         compositeHolder.SetActive(true);
@@ -110,7 +163,13 @@ public class ColliderToMesh : MonoBehaviour
         {
             List<Vector2> path = new List<Vector2>();
             compositeCollider.GetPath(i, path);
-            allPaths.Add(path.ToArray());
+
+            Vector2[] transformedPath = path
+                .Select(p => compositeHolder.transform.TransformPoint(new Vector3(p.x, p.y, 0)))
+                .Select(v => new Vector2(v.x, v.y))
+                .ToArray();
+
+            allPaths.Add(transformedPath);
         }
 
         CombineInstance[] combine = new CombineInstance[allPaths.Count];
@@ -127,12 +186,16 @@ public class ColliderToMesh : MonoBehaviour
         finalMesh.RecalculateBounds();
 
         GameObject meshObject = new GameObject("CombinedMesh");
-        meshObject.transform.SetParent(transform, false);
+        meshObject.transform.position = Vector3.zero;
+        meshObject.transform.rotation = Quaternion.identity;
+        meshObject.transform.localScale = Vector3.one;
         MeshFilter meshFilter = meshObject.AddComponent<MeshFilter>();
         meshFilter.mesh = finalMesh;
 
         MeshCollider meshCollider = meshObject.AddComponent<MeshCollider>();
         meshCollider.sharedMesh = finalMesh;
+        meshObject.AddComponent<SM64StaticTerrain>();
+        meshObject.GetComponent<SM64StaticTerrain>().SurfaceType = SM64SurfaceType.Hangable;
 
         if (addRenderer)
         {
